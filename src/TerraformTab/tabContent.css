@@ -1,0 +1,39 @@
+pre {
+  background-color: white;
+  border-radius: 10px;
+  padding: 10px;
+}
+.bold {
+  font-weight: bold;
+}
+.black {
+  color: black;
+}
+.red {
+  color: #DD4124;
+  font-size: large;
+  font-weight: bold;
+}
+.green {
+  color: #88B04B;
+  font-size: large;
+}
+.yellow {
+  color: #EFC050;
+  font-size: large;
+}
+.blue {
+  color: #34568B;
+}
+.magenta {
+  color: #D65076;
+}
+.cyan {
+  color: #45B8AC;
+}
+.white {
+  color: white;
+}
+.grey {
+  color: grey;
+}

@@ -1,1 +1,0 @@
-# azure-pipelines-terraform-output
