@@ -9,7 +9,7 @@ The plugin is available on the Visual Studio Marketplace [here](https://marketpl
 
 Simply call the Terraform Output task with the appropriate inputs
 ```yaml
-- task: TerraformOutput@0
+- task: TerraformOutput@1
   inputs:
     outputFilePath: example.tfplan
     artifactName: Staging

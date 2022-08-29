@@ -8,7 +8,7 @@ A small plugin that brings a Terraform Plan window into the build results
 
 Simply call the Terraform Output task with the appropriate inputs
 ```yaml
-- task: TerraformOutput@0
+- task: TerraformOutput@1
   inputs:
     outputFilePath: example.tfplan
     artifactName: Staging
