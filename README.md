@@ -27,4 +27,4 @@ The dropdown box is unique to each build, so it won't show previous build artifa
 ![image](https://user-images.githubusercontent.com/7008565/187101529-e9430663-a3fe-4133-8a90-f1c559fca4d5.png)  
 
 Once you have selected your state file, it will show your plan output  
-![image](https://user-images.githubusercontent.com/7008565/187101610-8b9bcbc3-9198-4bc2-b786-7be1ec6d3c66.png)
+![image](https://user-images.githubusercontent.com/7008565/187106128-f1f7e6d0-9015-4fba-9d3f-49dfaa524505.png)
