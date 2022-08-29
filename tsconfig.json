@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "charset": "utf8",
+    "experimentalDecorators": true,
+    "module": "amd",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strict": false,
+    "target": "es5",
+    "rootDir": "src/",
+    "outDir": "dist/",
+    "jsx": "react",
+    "lib": [
+      "es5",
+      "es6",
+      "dom",
+      "es2015.promise"
+    ],
+    "types": [
+      "react",
+      "node"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "allowUmdGlobalAccess": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": false,
+    "noEmit": false,
+  },
+  "include": [
+    "src"
+  ],
+  "files": [
+    "src/TerraformTab/tabContent.tsx"
+  ]
+}
