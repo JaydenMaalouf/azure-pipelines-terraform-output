@@ -24,7 +24,7 @@ This adds a new tab in the build results
 
 In the Terraform Plan tab, your associated Terraform Output artifacts will appear in the dropdown box  
 The dropdown box is unique to each build, so it won't show previous build artifacts  
-![image](https://user-images.githubusercontent.com/7008565/187106341-f6db6ebd-bd5d-41ff-ae22-b3fd2392215a.png)  
+![image](https://user-images.githubusercontent.com/7008565/187106547-4cbb9947-0ae2-4dd9-8a0f-7d0b7d56f84b.png)  
 
 Once you have selected your state file, it will show your plan output  
 ![image](https://user-images.githubusercontent.com/7008565/187106128-f1f7e6d0-9015-4fba-9d3f-49dfaa524505.png)
