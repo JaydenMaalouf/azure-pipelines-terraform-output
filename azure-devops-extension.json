@@ -2,22 +2,22 @@
   "manifestVersion": 1,
   "id": "terraform-output",
   "publisher": "JaydenMaalouf",
-  "version": "1.0.68",
+  "version": "1.1.0",
   "name": "Terraform Output",
   "description": "Adds a tab for Terraform Plan outputs",
+  "galleryFlags": ["Public"],
   "icons": {
     "default": "images/icon.png",
     "large": "images/icon.png"
   },
   "categories": ["Azure Pipelines"],
-  "Tags": ["Terraform", "Output", "Plan", "HTML", "Tab", "DevOps"],
+  "tags": ["Terraform", "Output", "Plan", "HTML", "Tab", "DevOps"],
   "targets": [
     {
       "id": "Microsoft.VisualStudio.Services"
     }
   ],
   "scopes": ["vso.build_execute"],
-
   "content": {
     "details": {
       "path": "OVERVIEW.md"
