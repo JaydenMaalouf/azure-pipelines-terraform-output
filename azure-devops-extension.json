@@ -1,0 +1,74 @@
+{
+  "manifestVersion": 1,
+  "id": "terraform-output",
+  "publisher": "JaydenMaalouf",
+  "version": "1.0.68",
+  "name": "Terraform Output",
+  "description": "Adds a tab for Terraform Plan outputs",
+  "icons": {
+    "default": "images/icon.png",
+    "large": "images/icon.png"
+  },
+  "categories": ["Azure Pipelines"],
+  "Tags": ["Terraform", "Output", "Plan", "HTML", "Tab", "DevOps"],
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "scopes": ["vso.build_execute"],
+
+  "content": {
+    "details": {
+      "path": "OVERVIEW.md"
+    }
+  },
+  "files": [
+    {
+      "path": "tasks/TerraformOutput"
+    },
+    {
+      "path": "dist",
+      "addressable": true
+    },
+    {
+      "path": "images/1.png",
+      "addressable": true
+    },
+    {
+      "path": "images/2.png",
+      "addressable": true
+    },
+    {
+      "path": "images/3.png",
+      "addressable": true
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "uri": "https://github.com/JaydenMaalouf/azure-pipelines-terraform-output"
+  },
+  "contributions": [
+    {
+      "id": "pipeline-terraform-tab",
+      "type": "ms.vss-build-web.build-results-tab",
+      "description": "Embed Terraform Output in Azure Pipelines Build",
+      "targets": ["ms.vss-build-web.build-results-view"],
+      "properties": {
+        "name": "Terraform Plan",
+        "uri": "dist/TerraformTab/tabContent.html",
+        "registeredObjectId": "registerBuild",
+        "supportsTasks": ["88279389-1419-4920-8f6c-b16cfccb90d9"],
+        "dynamic": true
+      }
+    },
+    {
+      "id": "TerraformOutput",
+      "type": "ms.vss-distributed-task.task",
+      "targets": ["ms.vss-distributed-task.tasks"],
+      "properties": {
+        "name": "tasks/TerraformOutput"
+      }
+    }
+  ]
+}
