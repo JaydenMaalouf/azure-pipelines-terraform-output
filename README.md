@@ -18,13 +18,13 @@ Simply call the Terraform Output task with the appropriate inputs
 ### Build Results
 
 This adds a new tab in the build results  
-![image](https://user-images.githubusercontent.com/7008565/187101377-3add161e-5c8d-4229-98e1-8bac50ac15bf.png)
+![image](https://user-images.githubusercontent.com/7008565/187106474-ce7d6353-c69b-4d65-bd54-8a230864b537.png)  
 
 #### Select your state file
 
 In the Terraform Plan tab, your associated Terraform Output artifacts will appear in the dropdown box  
 The dropdown box is unique to each build, so it won't show previous build artifacts  
-![image](https://user-images.githubusercontent.com/7008565/187101529-e9430663-a3fe-4133-8a90-f1c559fca4d5.png)  
+![image](https://user-images.githubusercontent.com/7008565/187106547-4cbb9947-0ae2-4dd9-8a0f-7d0b7d56f84b.png)  
 
 Once you have selected your state file, it will show your plan output  
-![image](https://user-images.githubusercontent.com/7008565/187101610-8b9bcbc3-9198-4bc2-b786-7be1ec6d3c66.png)
+![image](https://user-images.githubusercontent.com/7008565/187106128-f1f7e6d0-9015-4fba-9d3f-49dfaa524505.png)
