@@ -9,28 +9,23 @@ import { IListBoxItem } from "azure-devops-ui/ListBox";
 import { Observer } from "azure-devops-ui/Observer";
 import { Surface, SurfaceBackground } from "azure-devops-ui/Surface";
 import { ObservableArray, ObservableValue } from "azure-devops-ui/Core/Observable";
-import { Attachment, Build, BuildRestClient } from "azure-devops-extension-api/Build";
-import { getClient } from "azure-devops-extension-api";
+import { ReleaseTaskAttachment, Release, ReleaseRestClient, ReleaseEnvironment } from "azure-devops-extension-api/Release";
+import { getClient, CommonServiceIds, IProjectPageService } from "azure-devops-extension-api";
 import "./tabContent.scss";
 import "azure-devops-ui/Core/override.css";
 
 SDK.init();
+
 SDK.ready().then(() =>
 {
   try
   {
     const config = SDK.getConfiguration();
-    if (typeof config.onBuildChanged === "function")
-    {
-      config.onBuildChanged(async (build: Build) =>
-      {
-        var attachmentClient = new TerraformAttachmentClient(build);
-        ReactDOM.render(
-          <ReportPanel attachmentClient={attachmentClient} />,
-          document.getElementById("terraform-container")
-        );
-      });
-    }
+    var attachmentClient = new TerraformAttachmentClient(config.releaseEnvironment);
+    ReactDOM.render(
+      <ReportPanel attachmentClient={attachmentClient} />,
+      document.getElementById("terraform-container")
+    );
   } catch (error)
   {
     console.log(error);
@@ -127,7 +122,7 @@ class ReportPanel extends React.Component<ReportPanelProps> {
     this.setAttachment(attachment);
   };
 
-  private setAttachment(attachment: Attachment)
+  private setAttachment(attachment: ReleaseTaskAttachment)
   {
     if (attachment == null)
     {
@@ -155,13 +150,13 @@ class ReportPanel extends React.Component<ReportPanelProps> {
 
 class TerraformAttachmentClient
 {
-  private build: Build;
+  private releaseEnvironment: ReleaseEnvironment;
   private authHeaders: Object = undefined;
-  public attachments: Attachment[] = undefined;
+  public attachments: ReleaseTaskAttachment[] = undefined;
 
-  constructor(build: Build)
+  constructor(releaseEnvironment: ReleaseEnvironment)
   {
-    this.build = build;
+    this.releaseEnvironment = releaseEnvironment;
   }
 
   public async init()
@@ -172,12 +167,56 @@ class TerraformAttachmentClient
   private async fetchAttachments()
   {
     console.log("Get attachment list");
-    const buildClient: BuildRestClient = getClient(BuildRestClient);
-    this.attachments = await buildClient.getAttachments(
-      this.build.project.id,
-      this.build.id,
-      "terraform.plan"
-    );
+    const releaseClient: ReleaseRestClient = getClient(ReleaseRestClient);
+
+    const releaseId = this.releaseEnvironment.releaseId;
+
+    const projectService = await SDK.getService<IProjectPageService>(CommonServiceIds.ProjectPageService);
+    const project = await projectService.getProject();
+    const release = await releaseClient.getRelease(project.id, releaseId);
+
+    const environmentId = this.releaseEnvironment.id;
+    const environment = release.environments.filter((e) => e.id === environmentId)[0];
+
+    try
+    {
+      if (!(environment.deploySteps && environment.deploySteps.length))
+      {
+        throw new Error("This release has not been deployed yet");
+      }
+
+      const deployStep = environment.deploySteps[environment.deploySteps.length - 1];
+      if (!(deployStep.releaseDeployPhases && deployStep.releaseDeployPhases.length))
+      {
+        throw new Error("This release has no job");
+      }
+
+      const runPlanIds = deployStep.releaseDeployPhases.map(phase => phase.runPlanId);
+      if (runPlanIds.length == 0)
+      {
+        throw new Error("There are no plan IDs");
+      }
+
+      const promises = runPlanIds.map(runPlanId =>
+      {
+        return releaseClient.getReleaseTaskAttachments(
+          project.id,
+          environment.releaseId,
+          environment.id,
+          deployStep.attempt,
+          runPlanId,
+          "terraform.plan"
+        );
+      });
+
+      this.attachments = []
+        .concat
+        .apply([], await Promise.all(promises));
+    } catch (error)
+    {
+      console.error('Unable to load Cucumber Report', error)
+    }
+
     console.log(JSON.stringify(this.attachments));
   }
 
@@ -205,7 +244,7 @@ class TerraformAttachmentClient
     return this.authHeaders;
   }
 
-  public async downloadAttachment(attachment: Attachment): Promise<string>
+  public async downloadAttachment(attachment: ReleaseTaskAttachment): Promise<string>
   {
     const headers = await this.getAuthHeaders();
     console.log("downloading:");

@@ -3,11 +3,14 @@ import task = require("azure-pipelines-task-lib/task");
 import { TaskResult } from "azure-pipelines-task-lib/task";
 import { IExecOptions } from "azure-pipelines-task-lib/toolrunner";
 
-async function run() {
+async function run()
+{
   let terraformPath: string;
-  try {
+  try
+  {
     terraformPath = task.which("terraform", true);
-  } catch (err) {
+  } catch (err)
+  {
     throw "Terraform CLI not found.";
   }
 
@@ -21,7 +24,8 @@ async function run() {
     silent: true
   });
 
-  if (result.code != 0) {
+  if (result.code != 0)
+  {
     console.log(JSON.stringify(result));
     throw `Terraform Output failed with Exit Code: ${result.code}
     Error Message: ${result.error.message}`;
@@ -29,15 +33,18 @@ async function run() {
 
   task.debug(`Output file fetched: ${result.stdout}`);
   const artifactName = task.getInput("artifactName");
-  const outputFile = path.join(task.getVariable("Build.StagingDirectory"), artifactName);
+  const stagingPath = task.getVariable("Build.ArtifactStagingDirectory") ?? task.getVariable("System.ArtifactsDirectory");
+  const outputFile = path.join(stagingPath, artifactName);
   task.writeFile(outputFile, result.stdout);
   task.debug(`Output file written: ${outputFile}`);
   task.addAttachment("terraform.plan", artifactName, outputFile);
   console.log(`Uploaded Plan Output.`);
 }
 
-run().then(() => {
+run().then(() =>
+{
   task.setResult(TaskResult.Succeeded, "");
-}).catch((error) =>  {
+}).catch((error) =>
+{
   task.setResult(TaskResult.Failed, error);
 });

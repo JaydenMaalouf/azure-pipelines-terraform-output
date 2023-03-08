@@ -2,22 +2,36 @@
   "manifestVersion": 1,
   "id": "terraform-output",
   "publisher": "JaydenMaalouf",
-  "version": "1.1.2",
+  "version": "1.1.18",
   "name": "Terraform Output",
   "description": "Adds a tab for Terraform Plan outputs",
-  "galleryFlags": ["Public"],
+  "galleryFlags": [
+    "Public"
+  ],
   "icons": {
     "default": "images/icon.png",
     "large": "images/icon.png"
   },
-  "categories": ["Azure Pipelines"],
-  "tags": ["Terraform", "Output", "Plan", "HTML", "Tab", "DevOps"],
+  "categories": [
+    "Azure Pipelines"
+  ],
+  "tags": [
+    "Terraform",
+    "Output",
+    "Plan",
+    "HTML",
+    "Tab",
+    "DevOps"
+  ],
   "targets": [
     {
       "id": "Microsoft.VisualStudio.Services"
     }
   ],
-  "scopes": ["vso.build_execute"],
+  "scopes": [
+    "vso.release",
+    "vso.build_execute"
+  ],
   "content": {
     "details": {
       "path": "OVERVIEW.md"
@@ -53,19 +67,40 @@
       "id": "pipeline-terraform-tab",
       "type": "ms.vss-build-web.build-results-tab",
       "description": "Embed Terraform Output in Azure Pipelines Build",
-      "targets": ["ms.vss-build-web.build-results-view"],
+      "targets": [
+        "ms.vss-build-web.build-results-view"
+      ],
       "properties": {
         "name": "Terraform Plan",
         "uri": "dist/TerraformTab/tabContent.html",
         "registeredObjectId": "registerBuild",
-        "supportsTasks": ["88279389-1419-4920-8f6c-b16cfccb90d9"],
+        "supportsTasks": [
+          "88279389-1419-4920-8f6c-b16cfccb90d9"
+        ],
         "dynamic": true
+      }
+    },
+    {
+      "id": "releases-terraform-tab",
+      "type": "ms.vss-web.tab",
+      "description": "Embed Terraform Output in Azure Releases",
+      "targets": [
+        "ms.vss-releaseManagement-web.release-environment-editor-tab"
+      ],
+      "properties": {
+        "name": "Terraform Plan",
+        "uri": "dist/TerraformTabReleases/tabContent.html",
+        "supportsTasks": [
+          "88279389-1419-4920-8f6c-b16cfccb90d9"
+        ]
       }
     },
     {
       "id": "TerraformOutput",
       "type": "ms.vss-distributed-task.task",
-      "targets": ["ms.vss-distributed-task.tasks"],
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
       "properties": {
         "name": "tasks/TerraformOutput"
       }
