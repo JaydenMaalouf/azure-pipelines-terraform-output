@@ -35,7 +35,6 @@
     "src"
   ],
   "files": [
-    "src/TerraformTab/tabContent.tsx",
-    "src/TerraformTabReleases/tabContent.tsx"
+    "src/TerraformTab/tabContent.tsx"
   ]
 }

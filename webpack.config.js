@@ -1,12 +1,10 @@
 const path = require('path')
-const fs = require('fs')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const webpack = require('webpack')
 
 module.exports = {
   entry: {
     TerraformTab: './src/TerraformTab/tabContent.tsx',
-    TerraformTabReleases: './src/TerraformTabReleases/tabContent.tsx',
   },
   output: {
     filename: '[name]/tabContent.js',
