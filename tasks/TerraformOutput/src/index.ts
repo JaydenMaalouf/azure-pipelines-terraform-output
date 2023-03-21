@@ -3,14 +3,11 @@ import task = require("azure-pipelines-task-lib/task");
 import { TaskResult } from "azure-pipelines-task-lib/task";
 import { IExecOptions } from "azure-pipelines-task-lib/toolrunner";
 
-async function run()
-{
+async function run() {
   let terraformPath: string;
-  try
-  {
+  try {
     terraformPath = task.which("terraform", true);
-  } catch (err)
-  {
+  } catch (err) {
     throw "Terraform CLI not found.";
   }
 
@@ -24,8 +21,7 @@ async function run()
     silent: true
   });
 
-  if (result.code != 0)
-  {
+  if (result.code != 0) {
     console.log(JSON.stringify(result));
     throw `Terraform Output failed with Exit Code: ${result.code}
     Error Message: ${result.error.message}`;
@@ -41,10 +37,8 @@ async function run()
   console.log(`Uploaded Plan Output.`);
 }
 
-run().then(() =>
-{
+run().then(() => {
   task.setResult(TaskResult.Succeeded, "");
-}).catch((error) =>
-{
+}).catch((error) => {
   task.setResult(TaskResult.Failed, error);
 });

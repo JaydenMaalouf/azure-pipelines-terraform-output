@@ -3,37 +3,35 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Card } from "azure-devops-ui/Card";
 import { Page } from "azure-devops-ui/Page";
-import { Dropdown, DropdownExpandableButton } from "azure-devops-ui/Dropdown";
+import { Dropdown, DropdownCallout, DropdownExpandableButton } from "azure-devops-ui/Dropdown";
 import { DropdownSelection } from "azure-devops-ui/Utilities/DropdownSelection";
-import { IListBoxItem } from "azure-devops-ui/ListBox";
+import { IListBoxItem, ListBoxItemType, LoadingCell } from "azure-devops-ui/ListBox";
 import { Observer } from "azure-devops-ui/Observer";
 import { Surface, SurfaceBackground } from "azure-devops-ui/Surface";
-import { ObservableArray, ObservableValue } from "azure-devops-ui/Core/Observable";
+import { ObservableValue } from "azure-devops-ui/Core/Observable";
+import { GroupedItemProvider } from "azure-devops-ui/Utilities/GroupedItemProvider";
 import { Build, BuildRestClient } from "azure-devops-extension-api/Build";
+import { Location } from "azure-devops-ui/Utilities/Position";
 import { ReleaseEnvironment, ReleaseRestClient } from "azure-devops-extension-api/Release";
 import { getClient, CommonServiceIds, IProjectPageService } from "azure-devops-extension-api";
 import "./tabContent.scss";
 import "azure-devops-ui/Core/override.css";
+import { ITableColumn } from "azure-devops-ui/Table";
 
 SDK.init();
 
-SDK.ready().then(() =>
-{
-  try
-  {
+SDK.ready().then(() => {
+  try {
     const config = SDK.getConfiguration();
-    if (typeof config.releaseEnvironment === "object")
-    {
+    if (typeof config.releaseEnvironment === "object") {
       var attachmentClient = new ReleaseAttachmentClient(config.releaseEnvironment);
       ReactDOM.render(
         <ReportPanel attachmentClient={attachmentClient} />,
         document.getElementById("terraform-container")
       );
     }
-    else if (typeof config.onBuildChanged === "function")
-    {
-      config.onBuildChanged(async (build: Build) =>
-      {
+    else if (typeof config.onBuildChanged === "function") {
+      config.onBuildChanged(async (build: Build) => {
         var attachmentClient = new PipelineAttachmentClient(build);
         ReactDOM.render(
           <ReportPanel attachmentClient={attachmentClient} />,
@@ -41,54 +39,80 @@ SDK.ready().then(() =>
         );
       });
     }
-  } catch (error)
-  {
+  } catch (error) {
     console.log(error);
   }
 });
 
-interface ReportPanelProps
-{
+interface ReportPanelProps {
   attachmentClient: BaseAttachmentClient;
 }
 
 class ReportPanel extends React.Component<ReportPanelProps> {
   private selection = new DropdownSelection();
   private content = new ObservableValue<string>("");
-  private items = new ObservableArray<string>();
+  private loading = new ObservableValue<boolean>(false);
+  private loadingItem: IListBoxItem = {
+    id: "loading",
+    type: ListBoxItemType.Loading,
+    render: (
+      rowIndex: number,
+      columnIndex: number,
+      tableColumn: ITableColumn<IListBoxItem<{}>>,
+      tableItem: IListBoxItem<{}>
+    ) => {
+      return (
+        <LoadingCell
+          key={rowIndex}
+          columnIndex={columnIndex}
+          tableColumn={tableColumn}
+          tableItem={tableItem}
+          onMount={this.loadAttachments}
+        />
+      );
+    }
+  };
+  private itemProvider = new GroupedItemProvider([this.loadingItem], [], true);
 
-  constructor(props: ReportPanelProps)
-  {
+  constructor(props: ReportPanelProps) {
     super(props);
   }
 
-  componentWillMount()
-  {
-    this.loadAttachments();
-  }
-
-  public render()
-  {
+  public render() {
     return (
       <Surface background={SurfaceBackground.neutral}>
         <Page className="flex-grow">
           <div className="page-content page-content-top">
             <div style={{ marginBottom: "8px" }}>
               <Dropdown
-                selection={this.selection}
-                items={this.items.value}
+                ariaLabel="Loading"
+                items={this.itemProvider}
+                loading={this.loading}
                 placeholder="Select an output file"
+                selection={this.selection}
                 onSelect={this.onSelect}
+                width={250}
+                renderCallout={props => (
+                  <DropdownCallout
+                    {...props}
+                    dropdownOrigin={{
+                      horizontal: Location.start,
+                      vertical: Location.start
+                    }}
+                    anchorOrigin={{
+                      horizontal: Location.start,
+                      vertical: Location.end
+                    }}
+                  />
+                )}
                 renderExpandable={(props) => (
                   <DropdownExpandableButton {...props} />
                 )}
               />
             </div>
             <Observer content={this.content}>
-              {(props: { content: string }) =>
-              {
-                if (!props.content)
-                {
+              {(props: { content: string }) => {
+                if (!props.content) {
                   return <div></div>;
                 }
 
@@ -107,8 +131,7 @@ class ReportPanel extends React.Component<ReportPanelProps> {
 
                 let output = props.content.replace(
                   /.\[(3[0-7]|90|1)m/g,
-                  function (x)
-                  {
+                  function (x) {
                     let regExp = new RegExp(/.\[(3[0-7]|90|1)m/g);
                     let colour = regExp.exec(x);
                     let colourCode = colour[1];
@@ -134,66 +157,58 @@ class ReportPanel extends React.Component<ReportPanelProps> {
   private onSelect = (
     event: React.SyntheticEvent<HTMLElement>,
     item: IListBoxItem<{}>
-  ) =>
-  {
+  ) => {
     console.log(`item selected ${item.id}`);
     const attachment = this.props.attachmentClient.getAttachment(item.id);
     this.setAttachment(attachment);
   };
 
-  private setAttachment(attachment: any)
-  {
-    if (attachment == null)
-    {
+  private setAttachment(attachment: any) {
+    if (attachment == null) {
       return;
     }
 
     this.props.attachmentClient
       .downloadAttachment(attachment)
-      .then((attachmentContent) =>
-      {
-        this.content.notify
+      .then((attachmentContent) => {
         this.content.value = attachmentContent;
         this.forceUpdate();
       });
   }
 
-  private loadAttachments = async () =>
-  {
-    await this.props.attachmentClient.init();
-    const attachmentNames: string[] = this.props.attachmentClient
-      .getAttachments()
-      .map((attachment) => attachment.name);
-    this.items.value.push(...attachmentNames);
+  private loadAttachments = async () => {
+    if (!this.loading.value) {
+      this.loading.value = true;
+      await this.props.attachmentClient.fetchAttachments();
+      const attachmentNames: IListBoxItem<{}>[] = this.props.attachmentClient
+        .getAttachments()
+        .map((attachment) => ({
+          id: attachment.name,
+          text: attachment.name
+        }));
+      this.itemProvider.pop();
+      this.itemProvider.push(...attachmentNames);
+      this.loading.value = false;
+    }
   };
 }
 
-abstract class BaseAttachmentClient
-{
+abstract class BaseAttachmentClient {
   private authHeaders: Object = undefined;
-  protected attachments: any[];
+  protected attachments: any[] = null;
 
-  public async init()
-  {
-    await this.fetchAttachments();
-  }
+  abstract fetchAttachments(): Promise<void>;
 
-  abstract fetchAttachments(): void;
-
-  public getAttachments()
-  {
+  public getAttachments() {
     return this.attachments;
   }
 
-  public getAttachment(attachmentName: string)
-  {
+  public getAttachment(attachmentName: string) {
     return this.attachments.find((x) => x.name == attachmentName);
   }
 
-  private async getAuthHeaders(): Promise<Object>
-  {
-    if (this.authHeaders === undefined)
-    {
+  private async getAuthHeaders(): Promise<Object> {
+    if (this.authHeaders === undefined) {
       console.log("Get access token");
       const accessToken = await SDK.getAccessToken();
       const b64encodedAuth = Buffer.from(":" + accessToken).toString("base64");
@@ -204,14 +219,12 @@ abstract class BaseAttachmentClient
     return this.authHeaders;
   }
 
-  public async downloadAttachment(attachment: any): Promise<string>
-  {
+  public async downloadAttachment(attachment: any): Promise<string> {
     const headers = await this.getAuthHeaders();
     console.log("downloading:");
     console.log(attachment);
     const response = await fetch(attachment._links.self.href, headers);
-    if (!response.ok)
-    {
+    if (!response.ok) {
       throw new Error(response.statusText);
     }
 
@@ -221,18 +234,15 @@ abstract class BaseAttachmentClient
   }
 }
 
-class PipelineAttachmentClient extends BaseAttachmentClient
-{
+class PipelineAttachmentClient extends BaseAttachmentClient {
   private build: Build;
 
-  constructor(build: Build)
-  {
+  constructor(build: Build) {
     super();
     this.build = build;
   }
 
-  async fetchAttachments()
-  {
+  async fetchAttachments() {
     console.log("Get attachment list");
     const buildClient: BuildRestClient = getClient(BuildRestClient);
     this.attachments = await buildClient.getAttachments(
@@ -243,18 +253,15 @@ class PipelineAttachmentClient extends BaseAttachmentClient
     console.log(JSON.stringify(this.attachments));
   }
 }
-class ReleaseAttachmentClient extends BaseAttachmentClient
-{
+class ReleaseAttachmentClient extends BaseAttachmentClient {
   private releaseEnvironment: ReleaseEnvironment;
 
-  constructor(releaseEnvironment: ReleaseEnvironment)
-  {
+  constructor(releaseEnvironment: ReleaseEnvironment) {
     super();
     this.releaseEnvironment = releaseEnvironment;
   }
 
-  async fetchAttachments()
-  {
+  async fetchAttachments() {
     console.log("Get attachment list");
     const releaseClient: ReleaseRestClient = getClient(ReleaseRestClient);
 
@@ -267,27 +274,22 @@ class ReleaseAttachmentClient extends BaseAttachmentClient
     const environmentId = this.releaseEnvironment.id;
     const environment = release.environments.filter((e) => e.id === environmentId)[0];
 
-    try
-    {
-      if (!(environment.deploySteps && environment.deploySteps.length))
-      {
+    try {
+      if (!(environment.deploySteps && environment.deploySteps.length)) {
         throw new Error("This release has not been deployed yet");
       }
 
       const deployStep = environment.deploySteps[environment.deploySteps.length - 1];
-      if (!(deployStep.releaseDeployPhases && deployStep.releaseDeployPhases.length))
-      {
+      if (!(deployStep.releaseDeployPhases && deployStep.releaseDeployPhases.length)) {
         throw new Error("This release has no job");
       }
 
       const runPlanIds = deployStep.releaseDeployPhases.map(phase => phase.runPlanId);
-      if (runPlanIds.length == 0)
-      {
+      if (runPlanIds.length == 0) {
         throw new Error("There are no plan IDs");
       }
 
-      const promises = runPlanIds.map(runPlanId =>
-      {
+      const promises = runPlanIds.map(runPlanId => {
         return releaseClient.getReleaseTaskAttachments(
           project.id,
           environment.releaseId,
@@ -301,8 +303,7 @@ class ReleaseAttachmentClient extends BaseAttachmentClient
       this.attachments = []
         .concat
         .apply([], await Promise.all(promises));
-    } catch (error)
-    {
+    } catch (error) {
       console.error('Unable to load Cucumber Report', error)
     }
 
