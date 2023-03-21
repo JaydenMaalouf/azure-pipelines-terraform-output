@@ -60,6 +60,10 @@ class ReportPanel extends React.Component<ReportPanelProps> {
   constructor(props: ReportPanelProps)
   {
     super(props);
+  }
+
+  componentWillMount()
+  {
     this.loadAttachments();
   }
 
@@ -148,6 +152,7 @@ class ReportPanel extends React.Component<ReportPanelProps> {
       .downloadAttachment(attachment)
       .then((attachmentContent) =>
       {
+        this.content.notify
         this.content.value = attachmentContent;
         this.forceUpdate();
       });
@@ -156,10 +161,10 @@ class ReportPanel extends React.Component<ReportPanelProps> {
   private loadAttachments = async () =>
   {
     await this.props.attachmentClient.init();
-    this.items.value = this.props.attachmentClient
+    const attachmentNames: string[] = this.props.attachmentClient
       .getAttachments()
       .map((attachment) => attachment.name);
-    this.forceUpdate();
+    this.items.value.push(...attachmentNames);
   };
 }
 
