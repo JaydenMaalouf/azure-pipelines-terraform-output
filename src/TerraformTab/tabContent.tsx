@@ -10,13 +10,13 @@ import { Observer } from "azure-devops-ui/Observer";
 import { Surface, SurfaceBackground } from "azure-devops-ui/Surface";
 import { ObservableValue } from "azure-devops-ui/Core/Observable";
 import { GroupedItemProvider } from "azure-devops-ui/Utilities/GroupedItemProvider";
-import { Build, BuildRestClient } from "azure-devops-extension-api/Build";
+import { Attachment, Build, BuildRestClient } from "azure-devops-extension-api/Build";
 import { Location } from "azure-devops-ui/Utilities/Position";
-import { ReleaseEnvironment, ReleaseRestClient } from "azure-devops-extension-api/Release";
+import { ReleaseEnvironment, ReleaseRestClient, ReleaseTaskAttachment } from "azure-devops-extension-api/Release";
 import { getClient, CommonServiceIds, IProjectPageService } from "azure-devops-extension-api";
+import { ITableColumn } from "azure-devops-ui/Table";
 import "./tabContent.scss";
 import "azure-devops-ui/Core/override.css";
-import { ITableColumn } from "azure-devops-ui/Table";
 
 SDK.init();
 
@@ -40,15 +40,15 @@ SDK.ready().then(() => {
       });
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 });
 
-interface ReportPanelProps {
-  attachmentClient: BaseAttachmentClient;
+interface ReportPanelProps<T extends AttachmentType> {
+  attachmentClient: BaseAttachmentClient<T>;
 }
 
-class ReportPanel extends React.Component<ReportPanelProps> {
+class ReportPanel<T extends AttachmentType> extends React.Component<ReportPanelProps<T>> {
   private selection = new DropdownSelection();
   private content = new ObservableValue<string>("");
   private loading = new ObservableValue<boolean>(false);
@@ -74,7 +74,7 @@ class ReportPanel extends React.Component<ReportPanelProps> {
   };
   private itemProvider = new GroupedItemProvider([this.loadingItem], [], true);
 
-  constructor(props: ReportPanelProps) {
+  constructor(props: ReportPanelProps<T>) {
     super(props);
   }
 
@@ -111,7 +111,7 @@ class ReportPanel extends React.Component<ReportPanelProps> {
               />
             </div>
             <Observer content={this.content}>
-              {(props: { content: string }) => {
+              {(props: { content: string; }) => {
                 if (!props.content) {
                   return <div></div>;
                 }
@@ -158,7 +158,6 @@ class ReportPanel extends React.Component<ReportPanelProps> {
     event: React.SyntheticEvent<HTMLElement>,
     item: IListBoxItem<{}>
   ) => {
-    console.log(`item selected ${item.id}`);
     const attachment = this.props.attachmentClient.getAttachment(item.id);
     this.setAttachment(attachment);
   };
@@ -193,9 +192,14 @@ class ReportPanel extends React.Component<ReportPanelProps> {
   };
 }
 
-abstract class BaseAttachmentClient {
+type AttachmentType = {
+  _links: any;
+  name: string;
+};
+
+abstract class BaseAttachmentClient<T extends AttachmentType> {
   private authHeaders: Object = undefined;
-  protected attachments: any[] = null;
+  protected attachments: T[] = [];
 
   abstract fetchAttachments(): Promise<void>;
 
@@ -209,7 +213,6 @@ abstract class BaseAttachmentClient {
 
   private async getAuthHeaders(): Promise<Object> {
     if (this.authHeaders === undefined) {
-      console.log("Get access token");
       const accessToken = await SDK.getAccessToken();
       const b64encodedAuth = Buffer.from(":" + accessToken).toString("base64");
       this.authHeaders = {
@@ -219,22 +222,18 @@ abstract class BaseAttachmentClient {
     return this.authHeaders;
   }
 
-  public async downloadAttachment(attachment: any): Promise<string> {
+  public async downloadAttachment(attachment: T): Promise<string> {
     const headers = await this.getAuthHeaders();
-    console.log("downloading:");
-    console.log(attachment);
     const response = await fetch(attachment._links.self.href, headers);
     if (!response.ok) {
       throw new Error(response.statusText);
     }
 
-    console.log("repsonse");
-    console.log(response);
     return await response.text();
   }
 }
 
-class PipelineAttachmentClient extends BaseAttachmentClient {
+class PipelineAttachmentClient extends BaseAttachmentClient<Attachment> {
   private build: Build;
 
   constructor(build: Build) {
@@ -243,17 +242,16 @@ class PipelineAttachmentClient extends BaseAttachmentClient {
   }
 
   async fetchAttachments() {
-    console.log("Get attachment list");
     const buildClient: BuildRestClient = getClient(BuildRestClient);
     this.attachments = await buildClient.getAttachments(
       this.build.project.id,
       this.build.id,
       "terraform.plan"
     );
-    console.log(JSON.stringify(this.attachments));
   }
 }
-class ReleaseAttachmentClient extends BaseAttachmentClient {
+
+class ReleaseAttachmentClient extends BaseAttachmentClient<ReleaseTaskAttachment> {
   private releaseEnvironment: ReleaseEnvironment;
 
   constructor(releaseEnvironment: ReleaseEnvironment) {
@@ -262,7 +260,6 @@ class ReleaseAttachmentClient extends BaseAttachmentClient {
   }
 
   async fetchAttachments() {
-    console.log("Get attachment list");
     const releaseClient: ReleaseRestClient = getClient(ReleaseRestClient);
 
     const releaseId = this.releaseEnvironment.releaseId;
@@ -275,12 +272,12 @@ class ReleaseAttachmentClient extends BaseAttachmentClient {
     const environment = release.environments.filter((e) => e.id === environmentId)[0];
 
     try {
-      if (!(environment.deploySteps && environment.deploySteps.length)) {
+      if (!environment.deploySteps || environment.deploySteps.length == 0) {
         throw new Error("This release has not been deployed yet");
       }
 
       const deployStep = environment.deploySteps[environment.deploySteps.length - 1];
-      if (!(deployStep.releaseDeployPhases && deployStep.releaseDeployPhases.length)) {
+      if (!deployStep.releaseDeployPhases || deployStep.releaseDeployPhases.length == 0) {
         throw new Error("This release has no job");
       }
 
@@ -289,24 +286,36 @@ class ReleaseAttachmentClient extends BaseAttachmentClient {
         throw new Error("There are no plan IDs");
       }
 
-      const promises = runPlanIds.map(runPlanId => {
-        return releaseClient.getReleaseTaskAttachments(
-          project.id,
-          environment.releaseId,
-          environment.id,
-          deployStep.attempt,
-          runPlanId,
-          "terraform.plan"
-        );
-      });
+      let attachments: ReleaseTaskAttachment[] = [];
+      await Promise.all(runPlanIds.map(async (runPlanId) => {
+        try {
+          if (runPlanId == null) {
+            return;
+          }
 
-      this.attachments = []
-        .concat
-        .apply([], await Promise.all(promises));
+          const result = await releaseClient.getReleaseTaskAttachments(
+            project.id,
+            environment.releaseId,
+            environment.id,
+            deployStep.attempt,
+            runPlanId,
+            "terraform.plan"
+          );
+
+          if (!result || result.length == 0) {
+            return;
+          }
+
+          attachments = attachments.concat(result);
+        }
+        catch (error) {
+          console.error(`Failed to get attachments for ${runPlanId}`, error);
+        }
+      }));
+
+      this.attachments = attachments;
     } catch (error) {
-      console.error('Unable to load Cucumber Report', error)
+      console.error('Unable to load Terraform Plans', error);
     }
-
-    console.log(JSON.stringify(this.attachments));
   }
 }

@@ -22,7 +22,6 @@ async function run() {
   });
 
   if (result.code != 0) {
-    console.log(JSON.stringify(result));
     throw `Terraform Output failed with Exit Code: ${result.code}
     Error Message: ${result.error.message}`;
   }
