@@ -22,8 +22,9 @@ async function run() {
   });
 
   if (result.code != 0) {
+    const error = result?.error?.message ?? result?.stderr ?? "Unknown Error";
     throw `Terraform Output failed with Exit Code: ${result.code}
-    Error Message: ${result.error.message}`;
+    Error Message: ${error}`;
   }
 
   task.debug(`Output file fetched: ${result.stdout}`);
