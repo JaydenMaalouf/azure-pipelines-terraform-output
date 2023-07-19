@@ -26,14 +26,14 @@ If you have multiple output files, you can use glob pattern matching to pickup a
 
 The following inputs are available to override
 
-| Input              | Type               | Description               |
-| ---------------------- | ---------------------- | ---------------------- |
-| useGlobPattern | boolean | Whether to use a search pattern to find output files |
-| outputFilePattern | string | File pattern used to find output files (only visible if useGlobPattern is true) |
-| searchDirectory | string | Directory the file search should start (only visible if useGlobPattern is true) |
-| inferArtifactName | boolean | Infer artifact name from outputFilePath filename (only visible if useGlobPattern is false) |
-| outputFilePath | filePath | File path of the outfile file (only visible if useGlobPattern is false) |
-| artifactName | string | Artifact name used in the dropdown (only visible if useGlobPattern and inferArtifactName are false) |
+| Input             | Type     | Default                                         | Description                                                                                         |
+| ----------------- | -------- | ----------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| useGlobPattern    | boolean  | false                                           | Whether to use a search pattern to find output files                                                |
+| outputFilePattern | string   | \*\*_/_\*.tfplan                                | File pattern used to find output files (only visible if useGlobPattern is true)                     |
+| searchDirectory   | string   | $(System.DefaultWorkingDirectory)               | Directory the file search should start (only visible if useGlobPattern is true)                     |
+| inferArtifactName | boolean  | false                                           | Infer artifact name from outputFilePath filename (only visible if useGlobPattern is false)          |
+| outputFilePath    | filePath | $(System.DefaultWorkingDirectory)/output.tfplan | File path of the outfile file (only visible if useGlobPattern is false)                             |
+| artifactName      | string   |                                                 | Artifact name used in the dropdown (only visible if useGlobPattern and inferArtifactName are false) |
 
 ## Results
 
