@@ -79,8 +79,8 @@ async function run() {
     }
 
     result.forEach(element => {
-      const outputFilePath = path.relative(searchDirectory, element);
       const workingDirectory = path.dirname(element);
+      const outputFilePath = path.relative(workingDirectory, element);
       handleTerraformOutput(terraformPath, outputFilePath, workingDirectory, true);
     });
   } else {
