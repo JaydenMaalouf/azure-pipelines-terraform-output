@@ -1,5 +1,5 @@
-import path = require('path');
-import task = require('azure-pipelines-task-lib/task');
+import * as path from 'path';
+import * as task from 'azure-pipelines-task-lib/task';
 import { TaskResult } from 'azure-pipelines-task-lib/task';
 import { IExecOptions } from 'azure-pipelines-task-lib/toolrunner';
 
