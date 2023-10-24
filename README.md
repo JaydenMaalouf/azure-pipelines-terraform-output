@@ -1,11 +1,11 @@
 # Azure Pipelines - Terraform Output
 
-A small plugin that brings a Terraform Plan window into the pipeline and release results  
-The plugin is available on the Visual Studio Marketplace [here](https://marketplace.visualstudio.com/items?itemName=JaydenMaalouf.terraform-output)
+A small plugin that brings a Terraform Plan window into the pipeline and release results.
+The plugin is available on the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=JaydenMaalouf.terraform-output)
 
 ## Usage
 
-Simply call the Terraform Output task with the appropriate inputs
+Simply call the Terraform Output task with the appropriate inputs:
 
 ```yaml
 - task: TerraformOutput@1
@@ -14,7 +14,7 @@ Simply call the Terraform Output task with the appropriate inputs
     artifactName: Staging
 ```
 
-If you have multiple output files, you can use glob pattern matching to pickup all outputs
+If you have multiple output files, you can use glob pattern matching to pickup all outputs:
 
 ```yaml
 - task: TerraformOutput@1
@@ -24,7 +24,7 @@ If you have multiple output files, you can use glob pattern matching to pickup a
 
 #### Inputs
 
-The following inputs are available to override
+The following inputs are available to override:
 
 | Input             | Type     | Default                                         | Description                                                                                         |
 | ----------------- | -------- | ----------------------------------------------- | --------------------------------------------------------------------------------------------------- |
@@ -37,7 +37,7 @@ The following inputs are available to override
 
 ## Results
 
-A new tab will be available in the results view
+A new tab will be available in the results view:
 
 | Pipelines              | Releases               |
 | ---------------------- | ---------------------- |
@@ -51,3 +51,29 @@ The dropdown box is unique to each build, so it won't show previous build artifa
 
 Once you have selected your state file, it will show your plan output
 ![image](images/3.png)
+
+## Troubleshooting
+
+### Error: Failed to load plugin schemas
+
+You get the following error when running the Terraform Load Output task:
+
+> Error while loading schemas for plugin components: Failed to obtain provider schema: Could not load the schema for provider registry.terraform.io/hashicorp/azurerm: failed to instantiate provider "registry.terraform.io/hashicorp/azurerm" to obtain schema: unavailable provider "registry.terraform.io/hashicorp/azurerm"..
+
+**Problem**
+
+You are not saving your `.tfplan` file in the directory that contains your Terraform code. For example doing the folowing in an Azure DevOps release **will not work**:
+
+```
+# DOES NOT WORK!
+$(System.DefaultWorkingDirectory)/example.tfplan
+```
+
+**Solution**
+
+Save your tfplan in the directory that contains your Terraform code, i.e. the same directory that you have configured for your `terraform init`. For example doing the folowing in an Azure DevOps release **will work**:
+
+```
+# `tf init` was done on $(System.DefaultWorkingDirectory)/Terraform-v2/drop/foobarproject/environments/dev08
+$(System.DefaultWorkingDirectory)/Terraform-v2/drop/foobarproject/environments/dev08/example.tfplan
+```
