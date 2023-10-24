@@ -1,7 +1,8 @@
 # Azure Pipelines - Terraform Output
 
 A small plugin that brings a Terraform Plan window into the pipeline and release results.
-The plugin is available on the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=JaydenMaalouf.terraform-output)
+
+The plugin is available on the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=JaydenMaalouf.terraform-output).
 
 ## Usage
 
@@ -56,7 +57,7 @@ Once you have selected your state file, it will show your plan output
 
 ### Error: Failed to load plugin schemas
 
-You get the following error when running the Terraform Load Output task:
+Issue - you get the following error when running the Terraform Load Output task:
 
 > Error while loading schemas for plugin components: Failed to obtain provider schema: Could not load the schema for provider registry.terraform.io/hashicorp/azurerm: failed to instantiate provider "registry.terraform.io/hashicorp/azurerm" to obtain schema: unavailable provider "registry.terraform.io/hashicorp/azurerm"..
 
