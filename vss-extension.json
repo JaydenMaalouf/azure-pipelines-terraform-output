@@ -1,16 +1,17 @@
 {
   "manifestVersion": 1,
-  "id": "terraform-output",
-  "publisher": "JaydenMaalouf",
-  "version": "1.1.54",
-  "name": "Terraform Output",
-  "description": "Adds a tab for Terraform Plan outputs",
+  "id": "frank-van-eykelen",
+  "publisher": "frank-van-eykelen",
+  "version": "0.1.7",
+  "name": "Terraform Markdown Output",
+  "description": "Adds a tab for Terraform Plan Markdown output",
+  "public": false,
   "galleryFlags": [
-    "Public"
+    "Preview"
   ],
   "icons": {
-    "default": "images/icon.png",
-    "large": "images/icon.png"
+    "default": "images/terraform-markdown.png",
+    "large": "images/terraform-markdown.png"
   },
   "categories": [
     "Azure Pipelines"
@@ -21,7 +22,12 @@
     "Plan",
     "HTML",
     "Tab",
-    "DevOps"
+    "DevOps",
+    "Markdown",
+    "Azure Pipelines",
+    "Azure DevOps",
+    "Pipelines",
+    "Releases"
   ],
   "targets": [
     {
@@ -64,7 +70,7 @@
   ],
   "repository": {
     "type": "git",
-    "uri": "https://github.com/JaydenMaalouf/azure-pipelines-terraform-output"
+    "uri": "https://github.com/frankvaneykelen-work/azure-pipelines-terraform-output"
   },
   "contributions": [
     {
@@ -79,7 +85,7 @@
         "uri": "dist/TerraformTab/tabContent.html",
         "registeredObjectId": "registerBuild",
         "supportsTasks": [
-          "88279389-1419-4920-8f6c-b16cfccb90d9"
+          "e1793133-0afe-43d6-9563-e8746f2f04df"
         ],
         "dynamic": true
       }
@@ -95,7 +101,7 @@
         "name": "Terraform Plan",
         "uri": "dist/TerraformTab/tabContent.html",
         "supportsTasks": [
-          "88279389-1419-4920-8f6c-b16cfccb90d9"
+          "e1793133-0afe-43d6-9563-e8746f2f04df"
         ]
       }
     },

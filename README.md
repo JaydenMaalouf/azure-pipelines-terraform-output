@@ -1,8 +1,8 @@
-# Azure Pipelines - Terraform Output
+# Azure Pipelines - Terraform Markdown Output
 
-A small plugin that brings a Terraform Plan window into the pipeline and release results.
+A small plugin that brings a Terraform Markdown Plan window into the pipeline and release results.
 
-The plugin is available on the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=JaydenMaalouf.terraform-output).
+The plugin not yet available on the [Visual Studio Marketplace]
 
 ## Usage
 
@@ -23,7 +23,7 @@ If you have multiple output files, you can use glob pattern matching to pickup a
     useGlobPattern: true
 ```
 
-#### Inputs
+### Inputs
 
 The following inputs are available to override:
 
@@ -64,20 +64,40 @@ Issue - you get the following error when running the Terraform Load Output task:
 
 > Error while loading schemas for plugin components: Failed to obtain provider schema: Could not load the schema for provider registry.terraform.io/hashicorp/azurerm: failed to instantiate provider "registry.terraform.io/hashicorp/azurerm" to obtain schema: unavailable provider "registry.terraform.io/hashicorp/azurerm"..
 
-**Problem**
+### Problem
 
 You are not saving your `.tfplan` file in the directory that contains your Terraform code. For example doing the folowing in an Azure DevOps release **will not work**:
 
-```
+```cmd
 # DOES NOT WORK!
 $(System.DefaultWorkingDirectory)/example.tfplan
 ```
 
-**Solution**
+### Solution
 
 Save your tfplan in the directory that contains your Terraform code, i.e. the same directory that you have configured for your `terraform init`. For example doing the folowing in an Azure DevOps release **will work**:
 
-```
+```cmd
 # `tf init` was done on $(System.DefaultWorkingDirectory)/Terraform-v2/drop/foobarproject/environments/dev08
 $(System.DefaultWorkingDirectory)/Terraform-v2/drop/foobarproject/environments/dev08/example.tfplan
+```
+
+## Links
+
+- [Develop a web extension](https://learn.microsoft.com/en-us/azure/devops/extend/get-started/node?toc=%2Fazure%2Fdevops%2Fmarketplace-extensibility%2Ftoc.json&view=azure-devops)
+- [Share you extension](https://learn.microsoft.com/en-us/azure/devops/extend/publish/overview?view=azure-devops#share-your-extension)
+
+## Notes on development
+
+Before packaging the extension, make sure to update the version in all of these files:
+
+- vss-extension.json
+- package.json
+- tasks\TerraformOutput\task.json
+
+Build & package order:
+
+```bash
+ npm run build
+ npm run package-extension
 ```

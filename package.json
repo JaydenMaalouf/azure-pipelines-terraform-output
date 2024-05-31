@@ -1,6 +1,6 @@
 {
   "name": "terraform-output",
-  "version": "1.0.0",
+  "version": "0.1.7",
   "description": "Terraform Output",
   "keywords": [
     "extensions",
@@ -20,7 +20,7 @@
     "build": "npm run compile",
     "build:dev": "npm run compile:dev && npm run postbuild",
     "postbuild": "npm run package-extension --rev-version",
-    "package-extension": "tfx extension create --manifests azure-devops-extension.json",
+    "package-extension": "tfx extension create",
     "publish-extension": "tfx extension publish --manifests azure-devops-extension.json",
     "test": "set TEST_REPORT_FILENAME=test-results.xml jest --verbose"
   },
