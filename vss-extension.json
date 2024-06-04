@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "frank-van-eykelen",
   "publisher": "frank-van-eykelen",
-  "version": "0.1.7",
+  "version": "0.2.3",
   "name": "Terraform Markdown Output",
   "description": "Adds a tab for Terraform Plan Markdown output",
   "public": false,
@@ -45,7 +45,7 @@
   },
   "files": [
     {
-      "path": "tasks/TerraformOutput"
+      "path": "tasks/TerraformMarkdownOutput"
     },
     {
       "path": "dist",
@@ -81,7 +81,7 @@
         "ms.vss-build-web.build-results-view"
       ],
       "properties": {
-        "name": "Terraform Plan",
+        "name": "TF MD",
         "uri": "dist/TerraformTab/tabContent.html",
         "registeredObjectId": "registerBuild",
         "supportsTasks": [
@@ -98,7 +98,7 @@
         "ms.vss-releaseManagement-web.release-environment-editor-tab"
       ],
       "properties": {
-        "name": "Terraform Plan",
+        "name": "TF MD",
         "uri": "dist/TerraformTab/tabContent.html",
         "supportsTasks": [
           "e1793133-0afe-43d6-9563-e8746f2f04df"
@@ -106,13 +106,13 @@
       }
     },
     {
-      "id": "TerraformOutput",
+      "id": "TerraformMarkdownOutput",
       "type": "ms.vss-distributed-task.task",
       "targets": [
         "ms.vss-distributed-task.tasks"
       ],
       "properties": {
-        "name": "tasks/TerraformOutput"
+        "name": "tasks/TerraformMarkdownOutput"
       }
     }
   ]

@@ -129,5 +129,5 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-tasks/TerraformOutput/src/index.js
+tasks/TerraformMarkdownOutput/src/index.js
 **.vsix

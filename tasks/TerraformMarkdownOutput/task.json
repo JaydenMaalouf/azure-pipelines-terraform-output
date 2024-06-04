@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
   "id": "e1793133-0afe-43d6-9563-e8746f2f04df",
-  "name": "TerraformOutput",
+  "name": "TerraformMarkdownOutput",
   "friendlyName": "Load Terraform Plan Markdown Output",
   "description": "Load Terraform Plan Markdown Output into Terraform Tab",
   "helpMarkDown": "[Link to documentation](https://github.com/frankvaneykelen-work/azure-pipelines-terraform-output)",
@@ -9,8 +9,8 @@
   "author": "Frank van Eykelen",
   "version": {
     "Major": 0,
-    "Minor": 1,
-    "Patch": 7
+    "Minor": 2,
+    "Patch": 3
   },
   "instanceNameFormat": "Load Terraform Plan Markdown Output",
   "inputs": [
@@ -37,7 +37,7 @@
       "label": "Search Directory",
       "defaultValue": "$(System.DefaultWorkingDirectory)",
       "required": false,
-      "helpMarkDown": "Directory to search for Terraform Plan output files. The default value is $(System.DefaultWorkingDirectory)",
+      "helpMarkDown": "Directory to search for Terraform Plan Markdown output files. The default value is $(System.DefaultWorkingDirectory)",
       "visibleRule": "useGlobPattern = true"
     },
     {
@@ -53,8 +53,8 @@
       "name": "outputFilePath",
       "type": "filePath",
       "label": "Output File Path",
-      "defaultValue": "$(System.DefaultWorkingDirectory)/output.tfplan",
-      "helpMarkDown": "Directory of the Terraform Plan output file. The default value is $(System.DefaultWorkingDirectory)/output.tfplan",
+      "defaultValue": "$(System.DefaultWorkingDirectory)/output.tfplan.md",
+      "helpMarkDown": "Directory of the Terraform Plan Markdown file. The default value is $(System.DefaultWorkingDirectory)/output.tfplan.md",
       "required": false,
       "visibleRule": "useGlobPattern = false"
     },

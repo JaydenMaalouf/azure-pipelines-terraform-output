@@ -9,7 +9,7 @@ The plugin not yet available on the [Visual Studio Marketplace]
 Simply call the Terraform Output task with the appropriate inputs:
 
 ```yaml
-- task: TerraformOutput@1
+- task: TerraformMarkdownOutput@1
   inputs:
     outputFilePath: example.tfplan
     artifactName: Staging
@@ -18,7 +18,7 @@ Simply call the Terraform Output task with the appropriate inputs:
 If you have multiple output files, you can use glob pattern matching to pickup all outputs:
 
 ```yaml
-- task: TerraformOutput@1
+- task: TerraformMarkdownOutput@1
   inputs:
     useGlobPattern: true
 ```
@@ -46,7 +46,7 @@ A new tab will be available in the results view:
 
 ### Select your output file
 
-In the Terraform Plan tab, your associated Terraform Output artifacts will appear in the dropdown box.
+In the TF MD tab, your associated Terraform Output artifacts will appear in the dropdown box.
 
 The dropdown box is unique to each build, so it won't show previous build artifacts:
 
@@ -86,6 +86,7 @@ $(System.DefaultWorkingDirectory)/Terraform-v2/drop/foobarproject/environments/d
 
 - [Develop a web extension](https://learn.microsoft.com/en-us/azure/devops/extend/get-started/node?toc=%2Fazure%2Fdevops%2Fmarketplace-extensibility%2Ftoc.json&view=azure-devops)
 - [Share you extension](https://learn.microsoft.com/en-us/azure/devops/extend/publish/overview?view=azure-devops#share-your-extension)
+- https://marketplace.visualstudio.com/manage
 
 ## Notes on development
 
@@ -93,7 +94,8 @@ Before packaging the extension, make sure to update the version in all of these 
 
 - vss-extension.json
 - package.json
-- tasks\TerraformOutput\task.json
+- tasks\TerraformMarkdownOutput\task.json
+- tasks\TerraformMarkdownOutput\package.json
 
 Build & package order:
 

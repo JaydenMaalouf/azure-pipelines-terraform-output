@@ -1,6 +1,6 @@
 {
   "name": "terraform-output",
-  "version": "0.1.7",
+  "version": "0.2.3",
   "description": "Terraform Output",
   "keywords": [
     "extensions",
@@ -15,7 +15,7 @@
   "scripts": {
     "clean": "rimraf ./dist",
     "compile": "npm run clean && npm run test && webpack --mode production && npm run compile:tasks",
-    "compile:tasks": "tsc -b ./tasks/TerraformOutput/tsconfig.json",
+    "compile:tasks": "tsc -b ./tasks/TerraformMarkdownOutput/tsconfig.json",
     "compile:dev": "npm run clean && npm run test && webpack --mode development",
     "build": "npm run compile",
     "build:dev": "npm run compile:dev && npm run postbuild",
