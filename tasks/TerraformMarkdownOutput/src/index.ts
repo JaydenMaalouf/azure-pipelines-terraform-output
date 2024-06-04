@@ -1,24 +1,34 @@
+import * as fs from 'fs';
 import * as path from 'path';
 import * as task from 'azure-pipelines-task-lib/task';
 import { TaskResult } from 'azure-pipelines-task-lib/task';
 import { IExecOptions } from 'azure-pipelines-task-lib/toolrunner';
 
-function handleTerraformOutput(terraformPath: string, filePath: string, workingDirectory: string, inferArtifactName: boolean) {
-  const terraformTool = task.tool(terraformPath);
-  terraformTool.arg(['show', filePath]);
+function handleTerraformMarkdownOutput(terraformPath: string, filePath: string, workingDirectory: string, inferArtifactName: boolean) {
+  // Open the terraformPath markdown file
+  task.debug(`Fetching output file: ${filePath}`);
+  // const markdownFilePath = path.join(workingDirectory, filePath);
+  const markdownFilePath = filePath;
+  const markdownFileContent = fs.readFileSync(markdownFilePath, 'utf8');
 
-  const result = terraformTool.execSync(<IExecOptions>{
-    cwd: workingDirectory,
-    silent: true
-  });
 
-  if (result.code != 0) {
-    const error = result?.error?.message ?? result?.stderr ?? 'Unknown Error';
-    throw `Terraform Output failed with Exit Code: ${result.code}
-      Error Message: ${error}`;
-  }
+  
+  // const terraformTool = task.tool(terraformPath);
+  // terraformTool.arg(['show', filePath]);
 
-  task.debug(`Output file fetched: ${result.stdout}`);
+  // const result = terraformTool.execSync(<IExecOptions>{
+  //   cwd: workingDirectory,
+  //   silent: true
+  // });
+
+  // if (result.code != 0) {
+  //   const error = result?.error?.message ?? result?.stderr ?? 'Unknown Error';
+  //   throw `Terraform Output failed with Exit Code: ${result.code}
+  //     Error Message: ${error}`;
+  // }
+
+  // task.debug(`Output file fetched: ${result.stdout}`);
+
   let artifactName = task.getInput('artifactName');
   if (!artifactName) {
     inferArtifactName = true;
@@ -36,10 +46,10 @@ function handleTerraformOutput(terraformPath: string, filePath: string, workingD
 
   const stagingPath = task.getVariable('Build.ArtifactStagingDirectory') ?? task.getVariable('System.ArtifactsDirectory');
   const outputFile = path.join(stagingPath, artifactName);
-  task.writeFile(outputFile, result.stdout);
+  task.writeFile(outputFile, markdownFileContent);
   task.debug(`Output file written: ${outputFile}`);
-  task.addAttachment('terraform.plan', artifactName, outputFile);
-  console.log(`Uploaded Plan Output.`);
+  task.addAttachment('terraform.md', artifactName, outputFile);
+  console.log(`Uploaded Plan Markdown Output.`);
 }
 
 async function run() {
@@ -81,13 +91,13 @@ async function run() {
     result.forEach(element => {
       const workingDirectory = path.dirname(element);
       const outputFilePath = path.relative(workingDirectory, element);
-      handleTerraformOutput(terraformPath, outputFilePath, workingDirectory, true);
+      handleTerraformMarkdownOutput(terraformPath, outputFilePath, workingDirectory, true);
     });
   } else {
     const outputFilePath = task.getPathInput('outputFilePath');
     const workingDirectory = path.dirname(outputFilePath);
     const inferArtifactName = task.getBoolInput('inferArtifactName');
-    handleTerraformOutput(terraformPath, outputFilePath, workingDirectory, inferArtifactName);
+    handleTerraformMarkdownOutput(terraformPath, outputFilePath, workingDirectory, inferArtifactName);
   }
 }
 

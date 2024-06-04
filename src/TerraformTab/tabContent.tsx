@@ -315,7 +315,7 @@ class ReleaseAttachmentClient extends BaseAttachmentClient<ReleaseTaskAttachment
 
       this.attachments = attachments;
     } catch (error) {
-      console.error('Unable to load Terraform Plans', error);
+      console.error('Unable to load Terraform Markdown Plan(s)', error);
     }
   }
 }
