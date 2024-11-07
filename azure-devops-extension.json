@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "terraform-output",
   "publisher": "JaydenMaalouf",
-  "version": "1.1.54",
+  "version": "1.2.2",
   "name": "Terraform Output",
   "description": "Adds a tab for Terraform Plan outputs",
   "galleryFlags": [
